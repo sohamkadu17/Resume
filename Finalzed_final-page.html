@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success - Resume Builder</title>
+    <!-- Add jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #f0f9ff;
+            --accent: #3b82f6;
+            --text: #1e293b;
+            --light-text: #64748b;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --success-dark: #047857;
+        }
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        nav {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .main-content {
+            max-width: 800px;
+            margin: 120px auto 40px;
+            padding: 0 2rem;
+        }
+
+        .success-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            color: var(--success);
+        }
+
+        .success-title {
+            font-size: 2rem;
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            color: var(--light-text);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            text-decoration: none;
+            
+            background: var(--secondary);
+            color: var(--primary);
+        }
+        .action-btn btn-secondary{
+            text-decoration: none;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .share-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .share-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .share-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .share-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .share-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .share-label {
+            font-size: 0.9rem;
+            color: var(--light-text);
+        }
+
+        .next-steps {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .steps-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .step-card {
+            background: var(--secondary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-description {
+            font-size: 0.9rem;
+            color: var(--light-text);
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .share-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .success-card {
+                padding: 2rem;
+            }
+        }
+
+       
+        .pdf-preview-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .pdf-preview-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text);
+        }
+
+        .pdf-format-options {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .format-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: white;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .format-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .format-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+
+        #pdfPreview {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #pdfPreview iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Rest of your existing CSS */
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-content">
+            <a href="#" class="logo">ResumeBuilder</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="success-card">
+            <div class="success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h1 class="success-title">Resume Complete!</h1>
+            <p class="success-message">Your professional resume has been created successfully. Preview and download it below!</p>
+            <div class="action-buttons">
+                <button id="downloadBtn" class="action-btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download PDF
+                </button>
+                <button class="action-btn btn-secondary" >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                            <a href="review_trials.html"> Edit Resume </a>
+                </button>
+            </div>
+        </div>
+
+        <!-- Add PDF Preview Section -->
+        <div class="pdf-preview-section">
+            <h2 class="pdf-preview-title">Preview Your Resume</h2>
+            <div class="pdf-format-options">
+                <button class="format-btn active" data-format="a4">A4</button>
+                <button class="format-btn" data-format="letter">US Letter</button>
+                <button class="format-btn" data-format="legal">Legal</button>
+            </div>
+            <div id="pdfPreview"></div>
+        </div>
+
+        <!-- Original share section -->
+        <div class="share-section">
+            <h2 class="share-title">Share Your Resume</h2>
+            <div class="share-options">
+                <button class="share-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span class="share-label">Email</span>
+                </button>
+                <button class="share-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    <span class="share-label">Share Link</span>
+                </button>
+                <button class="share-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                    </svg>
+                    <span class="share-label">Copy</span>
+                </button>
+                <button class="share-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    <span class="share-label">LinkedIn</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Original next steps section -->
+        <div class="next-steps">
+            <h2 class="steps-title">Next Steps</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="step-title">Apply to Jobs</h3>
+                    <p class="step-description">Start applying to jobs with your new professional resume</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 011.035-5.624M17.657 16.657a5 5 0 01-7.07-7.07" />
+                        </svg>
+                    </div>
+                    <h3 class="step-title">Share Your Resume</h3>
+                    <p class="step-description">Distribute your resume through job platforms and emails</p>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <script>
+        // Initialize jsPDF
+        window.jsPDF = window.jspdf.jsPDF;
+
+        // Sample resume data - Replace this with your actual data
+        const resumeData = {
+            name: "John Doe",
+            email: "john.doe@example.com",
+            phone: "(555) 123-4567",
+            summary: "Experienced software developer with expertise in web technologies",
+            experience: [
+                {
+                    title: "Senior Developer",
+                    company: "Tech Corp",
+                    period: "2020-Present",
+                    description: "Led development of enterprise applications"
+                }
+            ],
+            education: [
+                {
+                    degree: "Bachelor of Science in Computer Science",
+                    school: "University of Technology",
+                    year: "2019"
+                }
+            ]
+        };
+
+        function generatePDF(format = 'a4') {
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: format
+            });
+
+            // Set fonts and styling
+            doc.setFont('helvetica', 'normal');
+            
+            // Add content
+            doc.setFontSize(24);
+            doc.text(resumeData.name, 20, 20);
+            
+            doc.setFontSize(12);
+            doc.text(resumeData.email, 20, 30);
+            doc.text(resumeData.phone, 20, 35);
+            
+            // Summary section
+            doc.setFontSize(16);
+            doc.text('Summary', 20, 45);
+            doc.setFontSize(12);
+            doc.text(resumeData.summary, 20, 55);
+            
+            // Experience section
+            doc.setFontSize(16);
+            doc.text('Experience', 20, 70);
+            let yPos = 80;
+            
+            resumeData.experience.forEach(exp => {
+                doc.setFontSize(14);
+                doc.text(exp.title, 20, yPos);
+                doc.setFontSize(12);
+                doc.text(`${exp.company} | ${exp.period}`, 20, yPos + 5);
+                doc.text(exp.description, 20, yPos + 10);
+                yPos += 20;
+            });
+            
+            // Education section
+            doc.setFontSize(16);
+            doc.text('Education', 20, yPos + 10);
+            yPos += 20;
+            
+            resumeData.education.forEach(edu => {
+                doc.setFontSize(14);
+                doc.text(edu.degree, 20, yPos);
+                doc.setFontSize(12);
+                doc.text(`${edu.school} | ${edu.year}`, 20, yPos + 5);
+                yPos += 15;
+            });
+
+            return doc;
+        }
+
+        function previewPDF(format = 'a4') {
+            const doc = generatePDF(format);
+            const pdfData = doc.output('datauristring');
+            document.getElementById('pdfPreview').innerHTML = `
+                <iframe src="${pdfData}" frameborder="0"></iframe>
+            `;
+        }
+
+        function downloadPDF(format = 'a4') {
+            const doc = generatePDF(format);
+            doc.save('resume.pdf');
+        }
+
+        // Initialize everything when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Generate initial preview
+            previewPDF();
+
+            // Handle format selection
+            const formatButtons = document.querySelectorAll('.format-btn');
+            formatButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    formatButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Update preview
+                    previewPDF(btn.dataset.format);
+                });
+            });
+
+            // Handle download button
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.addEventListener('click', () => {
+                const activeFormat = document.querySelector('.format-btn.active').dataset.format;
+                downloadPDF(activeFormat);
+            });
+        });
+    </script>
+</body>
+
+</html>

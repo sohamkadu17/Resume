@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview - Resume Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #f0f9ff;
+            --accent: #3b82f6;
+            --text: #1e293b;
+            --light-text: #64748b;
+            --background: #f8fafc;
+            --card: #ffffff;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        nav {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 100px auto 0;
+            padding: 2rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .preview-controls {
+            width: 300px;
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+        }
+
+        .control-panel {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .control-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .template-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-download {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-edit {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-share {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .resume-preview {
+            flex: 1;
+            background: var(--card);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+            min-height: 1000px;
+        }
+
+        .resume-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .resume-name {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .resume-contact {
+            color: var(--light-text);
+            font-size: 1rem;
+        }
+
+        .resume-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .experience-item,
+        .education-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .item-date {
+            color: var(--light-text);
+        }
+
+        .item-subtitle {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .item-description {
+            color: var(--light-text);
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .preview-controls {
+                width: 100%;
+                position: static;
+            }
+        }
+
+        @media print {
+
+            nav,
+            .preview-controls {
+                display: none;
+            }
+
+            .main-content {
+                margin: 0;
+                padding: 0;
+            }
+
+            .resume-preview {
+                box-shadow: none;
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-content">
+            <a href="#" class="logo">ResumeBuilder</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <aside class="preview-controls">
+            <div class="control-panel">
+                <h3 class="control-header">Template</h3>
+                <div class="control-group">
+                    <label class="control-label">Layout Style</label>
+                    <select class="template-select">
+                        <option>Professional</option>
+                        <option>Modern</option>
+                        <option>Creative</option>
+                        <option>Minimal</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Accent Color</label>
+                    <div class="color-options">
+                        <div class="color-option active" style="background: #2563eb;"></div>
+                        <div class="color-option" style="background: #059669;"></div>
+                        <div class="color-option" style="background: #7c3aed;"></div>
+                        <div class="color-option" style="background: #db2777;"></div>
+                        <div class="color-option" style="background: #ea580c;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn btn-download">Download PDF</button>
+                <button type="button" onclick="window.location.href='review_trials.html'" class="action-btn btn-edit">Edit Resume</button>
+                <button class="action-btn btn-share">Share Resume</button>
+            </div>
+        </aside>
+
+        <div class="resume-preview">
+            <div class="resume-header">
+                <div class="resume-name">John Doe</div>
+                <div class="resume-contact">
+                    john.doe@example.com • (555) 123-4567 • San Francisco, CA
+                </div>
+            </div>
+
+            <div class="resume-section">
+                <h2 class="section-title">Professional Experience</h2>
+                <div class="experience-item">
+                    <div class="item-header">
+                        <div class="item-title">Senior Software Engineer</div>
+                        <div class="item-date">2020 - Present</div>
+                    </div>
+                    <div class="item-subtitle">Tech Corp, San Francisco</div>
+                    <div class="item-description">
+                        • Led development of cloud-native applications using microservices architecture<br>
+                        • Managed team of 5 engineers, improving sprint velocity by 40%<br>
+                        • Implemented CI/CD pipeline reducing deployment time by 60%
+                    </div>
+                </div>
+            </div>
+
+            <div class="resume-section">
+                <h2 class="section-title">Education</h2>
+                <div class="education-item">
+                    <div class="item-header">
+                        <div class="item-title">Bachelor of Science in Computer Science</div>
+                        <div class="item-date">2016 - 2020</div>
+                    </div>
+                    <div class="item-subtitle">Stanford University</div>
+                    <div class="item-description">
+                        GPA: 3.8/4.0<br>
+                        Relevant Coursework: Data Structures, Algorithms, Machine Learning
+                    </div>
+                </div>
+            </div>
+
+            <div class="resume-section">
+                <h2 class="section-title">Skills</h2>
+                <div class="skills-list">
+                    <span class="skill-tag">JavaScript</span>
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">React</span>
+                    <span class="skill-tag">Node.js</span>
+                    <span class="skill-tag">AWS</span>
+                    <span class="skill-tag">Docker</span>
+                    <span class="skill-tag">Kubernetes</span>
+                    <span class="skill-tag">CI/CD</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Template selection
+        const templateSelect = document.querySelector('.template-select');
+        templateSelect.addEventListener('change', () => {
+            alert(`Changed template to: ${templateSelect.value}`);
+        });
+
+
+        // Color options
+        const colorOptions = document.querySelectorAll('.color-option');
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                colorOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                document.documentElement.style.setProperty('--primary', option.style.background);
+            });
+        });
+
+        // Action buttons
+        const actionButtons = document.querySelectorAll('.action-btn');
+        actionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.classList.contains('btn-download')) {
+                    window.print();
+                } else if (button.classList.contains('btn-edit')) {
+                    alert('Returning to edit mode');
+                } else if (button.classList.contains('btn-share')) {
+                    alert('Opening share options');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
